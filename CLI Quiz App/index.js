@@ -1,4 +1,9 @@
-let readlinesync = require("readline-sync");
+let readlineSync = require("readline-sync");
+let kuler = require("kuler");
+let score = 0;
+
+let userName = readlineSync.question("Please enter Your name -- ");
+console.log(kuler(`Hello ${userName} welcome to the Quiz`, "#f99f1e"));
 
 const database = {
   data: [
@@ -33,14 +38,54 @@ const database = {
   ],
 };
 
-function showQuestionsAndOptions() {
-  for (let i = 0; i < database.data.length; i++) {
-    console.log(`Q ${i + 1}) ${database.data[i].question}`);
-    for (let key in database.data[i].options) {
-      console.log(`${key} = ${database.data[i].options[key]}`);
-    }
-    let userAnswer = readlinesync.question("Select your option - \n");
+const leaderBoard = {
+  data: [
+    {
+      name: "Sahil",
+      score: 3,
+    },
+    {
+      name: "AJ",
+      score: 2,
+    },
+    {
+      name: "Vivek",
+      score: 1,
+    },
+  ],
+};
+
+function playGame(userAnswer, correctAnswer) {
+  if (userAnswer === correctAnswer) {
+    console.log(kuler("\nCorrect Answer", "#398564"));
+    score++;
+  } else {
+    console.log(kuler("\nWrong answer", "#ee4035"));
+    console.log(kuler(`Correct answer is ${correctAnswer}`, "#0392cf"));
   }
 }
 
-showQuestionsAndOptions();
+function showHighScorer(leaderBoard) {
+  leaderBoard.data.push({ name: userName, score: score });
+  let sortedScores = leaderBoard.data.sort((a, b) => b.score - a.score);
+  console.log("\nCheck Your Score in the Leaderboard\n");
+  for (let leader of sortedScores) {
+    console.log(`${leader.name} -- Score == ${leader.score}`);
+  }
+}
+
+function showQuestionsAndOptions() {
+  for (let i = 0; i < database.data.length; i++) {
+    console.log(`\nQ ${i + 1}) ${database.data[i].question}\n`);
+    for (let key in database.data[i].options) {
+      console.log(`${key} = ${database.data[i].options[key]}`);
+    }
+    let userAnswer = readlineSync
+      .question("\nSelect your option -- ")
+      .toLowerCase();
+    playGame(userAnswer, database.data[i].correctAnswer);
+  }
+}
+
+showQuestionsAndOptions(database);
+showHighScorer(leaderBoard);
